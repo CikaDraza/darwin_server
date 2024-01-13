@@ -15,11 +15,26 @@ app.get('/', (req, res) => {
   res.send('Hello API My Friend');
 });
 
+const CONNECTION_URL = process.env.MONGODB_URI;
+const PORT = process.env.PORT || 3000;
+
+const connectDB = () => {
+  try {
+    mongoose.connect(
+        CONNECTION_URL, {
+          useNewUrlParser: true
+      });
+      console.log(`on Port ${PORT} it seems to be everything ok.`);
+  } catch (error) {
+    return console.log(error.message);
+  }
+};
+
 app.use("/", productRoutes);
 app.use("/create_account", accountRoutes);
 app.use("/seed", seedRoutes);
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
+  connectDB
   console.log(`Server running on port ${PORT}`);
 });

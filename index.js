@@ -4,6 +4,10 @@ import cors from 'cors';
 import productRoutes from './routes/product_routes.js';
 import accountRoutes from './routes/account_routes.js';
 import seedRoutes from './routes/seed_routes.js';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
@@ -20,10 +24,7 @@ const PORT = process.env.PORT || 3000;
 
 const connectDB = () => {
   try {
-    mongoose.connect(
-        CONNECTION_URL, {
-          useNewUrlParser: true
-      });
+    mongoose.connect(CONNECTION_URL);
       console.log(`on Port ${PORT} it seems to be everything ok.`);
   } catch (error) {
     return console.log(error.message);
@@ -34,7 +35,4 @@ app.use("/", productRoutes);
 app.use("/create_account", accountRoutes);
 app.use("/seed", seedRoutes);
 
-app.listen(PORT, () => {
-  connectDB
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT,connectDB);

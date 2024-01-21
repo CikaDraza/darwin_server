@@ -33,6 +33,7 @@ const connectDB = () => {
 
 app.use("/", productRoutes);
 app.use("/create_account", accountRoutes);
+app.use("/accounts", accountRoutes);
 app.use("/seed", seedRoutes);
 
 app.listen(PORT,connectDB);

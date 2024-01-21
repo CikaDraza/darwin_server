@@ -4,6 +4,6 @@ import { createUser, getUser } from "../controllers/company_account_controller.j
 const router = express.Router();
 
 router.post("/", createUser);
-router.post("/", getUser);
+router.get("/", getUser);
 
 export default router;

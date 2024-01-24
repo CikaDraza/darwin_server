@@ -1,12 +1,25 @@
-
 import expressAsyncHandler from "express-async-handler";
 import { generateToken } from "../utils/generate_token.js";
 import Company_account from "../models/company_account_model.js";
 import bcrypt from 'bcryptjs';
+import { validationResult } from 'express-validator';
 
 export const createUser = expressAsyncHandler(async (req, res) => {
   try {
     const { email, password, companyName, vat, name, lastName, gender, billingAddress, deliveryAddresses, phoneNr, details, newsletter,    darwinPartner } = req.body;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+    if (!emailRegex.test(email)) {
+      res.status(400);
+      throw new Error("Invalid email format");
+    }
+    
+    if (!passwordRegex.test(password)) {
+      res.status(400);
+      throw new Error("Password must be at least 8 characters long and include at least one number");
+    }
   
     if(!email || !password || !vat) {
       res.status(400);
@@ -55,6 +68,42 @@ export const createUser = expressAsyncHandler(async (req, res) => {
     res.status(500).json({ message: "An error occurred while creating a new user" });
   }
 });
+
+export const loginUser = expressAsyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const { email, password } = req.body;
+
+  try {
+  
+    const user = await Company_account.findOne({ email: email });
+
+    if (!user) {
+      return res.status(404).json({ message: "The user does not exist" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const token = generateToken(user._id);
+    console.log(token);
+    res.json({
+      token,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    });
+    
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred while login a user" });
+  }
+
+}) 
 
 export const createNewDeliveryAddress = async (req, res) => {
   try {
@@ -146,7 +195,7 @@ export const deleteDeliveryAddress = async (req, res) => {
   }
 }
 
-export const getUser = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
     const allSigninUsers = await Company_account.find();
     res.status(200).json(allSigninUsers);
@@ -162,30 +211,10 @@ export const deleteUser = async (req, res) => {
 
   try {
     await Company_account.findByIdAndRemove(id).exec();
-    res.send("Успешно Избрисан Корисник");
+    res.send("Successfully Deleted User");
   } catch (error) {
     res.status(409).json({
       message: error.message
     });
   }  
 };
-
-export const authUser = expressAsyncHandler(async (req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
-
-    const user = await Company_account.findOne({ email });
-
-    if(user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        token: generateToken(user._id)
-      });
-  }else {
-    res.status(401);
-    throw new Error("Нетачан имејл или шифра");
-  }
-});

@@ -27,7 +27,6 @@ const companyAccountSchema = new mongoose.Schema(
   password: {type: String, required: true},
   vat: {
     type: String,
-    required: true,
     unique: true
   },
   companyName: String,

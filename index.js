@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import productRoutes from './routes/product_routes.js';
 import accountRoutes from './routes/account_routes.js';
+import cartRoutes from './routes/cart_routes.js';
 import seedRoutes from './routes/seed_routes.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -32,8 +33,8 @@ const connectDB = () => {
 };
 
 app.use("/", productRoutes);
-app.use("/create_account", accountRoutes);
 app.use("/accounts", accountRoutes);
+app.use("/cart", cartRoutes);
 app.use("/seed", seedRoutes);
 
 app.listen(PORT,connectDB);

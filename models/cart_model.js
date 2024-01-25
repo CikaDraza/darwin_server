@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const cartSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company_account' },
     items: [{
+        productId: String,
         productImage: String,
         title: String,
         brand: String,

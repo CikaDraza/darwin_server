@@ -9,7 +9,7 @@ export const addCart = expressAsyncHandler(async (req, res) => {
         const cart = await Cart.findOne({ userId });
         console.log(cart);
         if (cart) {
-            cart.items.push(items);
+            cart.items.push(...items);
             await cart.save();
         } else {
             const newCart = await Cart.create({ userId, items });

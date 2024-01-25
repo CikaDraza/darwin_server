@@ -37,28 +37,20 @@ export const getSingleCart = expressAsyncHandler(async (req, res) => {
   }
 });
 
-export const deleteProductCart = async (req, res) => {
+export const removeProductCart = expressAsyncHandler(async (req, res) => {
+  const { userId, productId } = req.body;
+
   try {
-
-    const { userId, items } = req.body;
-    const cart = await Cart.findOne({ userId });
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
-    }
-    const { productId } = items;
-    const productIndex = cart.items.findIndex((item) => item._id.toString() === productId);
-
-    if (productIndex === -1) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
-    cart.items.splice(productIndex, 1);
-
-    await cart.save();
-
-
-    res.status(200).json({ message: "Product deleted successfully" });
+      const cart = await Cart.findOne({ userId });
+      if (cart) {
+          // Uklanja proizvod iz korpe na osnovu productId
+          cart.items = cart.items.filter(item => item.productId !== productId);
+          await cart.save();
+          res.status(200).json({ message: 'Product removed from cart' });
+      } else {
+          res.status(404).json({ message: 'Cart not found' });
+      }
   } catch (error) {
-    res.status(500).json({ message: "An error occurred while deleting a product" });
+      res.status(500).json({ message: error.message });
   }
-}
+});

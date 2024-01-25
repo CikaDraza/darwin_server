@@ -25,7 +25,7 @@ export const getSingleCart = expressAsyncHandler(async (req, res) => {
   const userId = req.params;
 
   try {
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.find(userId);
     console.log(userId, cart);
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });
@@ -43,7 +43,6 @@ export const removeProductCart = expressAsyncHandler(async (req, res) => {
   try {
       const cart = await Cart.findOne({ userId });
       if (cart) {
-          // Uklanja proizvod iz korpe na osnovu productId
           cart.items = cart.items.filter(item => item.productId !== productId);
           await cart.save();
           res.status(200).json({ message: 'Product removed from cart' });

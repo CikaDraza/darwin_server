@@ -2,16 +2,16 @@ import expressAsyncHandler from "express-async-handler";
 import Cart from "../models/cart_model.js";
 
 export const addCart = expressAsyncHandler(async (req, res) => {
-    const { userId, productImage, title, brand, articleCode, price } = req.body;
+    const { userId, productId, productImage, title, brand, articleCode, price } = req.body;
 
     try {
         let cart = await Cart.findOne({ userId });
         console.log(cart);
         if (cart) {
-            cart.items.push({ productImage, title, brand, articleCode, price });
+            cart.items.push({ productImage, productId, title, brand, articleCode, price });
             await cart.save();
         } else {
-            const newCart = await Cart.create({ userId, items: [{ productImage, title, brand, articleCode, price }] });
+            const newCart = await Cart.create({ userId, items: [{ productImage, productId, title, brand, articleCode, price }] });
             await newCart.save();
         }
         res.status(200).json({ message: 'Product added to cart' });

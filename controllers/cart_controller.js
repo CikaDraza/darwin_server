@@ -25,7 +25,7 @@ export const getSingleCart = expressAsyncHandler(async (req, res) => {
   const userId = req.params;
 
   try {
-    const cart = await Cart.find(userId);
+    const cart = await Cart.findOne({ userId });
     console.log(userId, cart);
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });

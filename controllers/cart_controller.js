@@ -7,7 +7,6 @@ export const addCart = expressAsyncHandler(async (req, res) => {
 
     try {
         const cart = await Cart.findOne({ userId });
-        console.log(cart);
         if (cart) {
             cart.items.push(...items);
             await cart.save();
@@ -26,7 +25,6 @@ export const getSingleCart = expressAsyncHandler(async (req, res) => {
 
   try {
     const cart = await Cart.find(userId);
-    console.log(userId, cart);
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });
       return;

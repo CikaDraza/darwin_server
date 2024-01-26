@@ -37,9 +37,11 @@ export const getSingleCart = expressAsyncHandler(async (req, res) => {
 
 export const removeProductCart = expressAsyncHandler(async (req, res) => {
   const { userId, productId } = req.body;
+  console.log(userId, productId);
 
   try {
       const cart = await Cart.findOne({ userId });
+      console.log(cart);
       if (cart) {
           cart.items = cart.items.filter(item => item.productId !== productId);
           await cart.save();

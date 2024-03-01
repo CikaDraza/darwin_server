@@ -148,18 +148,21 @@ export const createNewDeliveryAddress = async (req, res) => {
 export const updateDeliveryAddress = async (req, res) => {
   try {
 
-    const { addressId, userId, newAddress } = req.body;
+    const { deliveryAddress, userId, deliveryAddressId } = req.body;
+console.log(deliveryAddress, userId, deliveryAddressId);
     const user = await Company_account.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const address = user.deliveryAddresses.id(addressId);  
-    if (!address) {
-      return res.status(404).json({ message: "Address not found" });
+    const addressIndex = user.deliveryAddresses.findIndex(addr => addr._id.toString() === deliveryAddressId);
+    
+    if (addressIndex === -1) {
+      return res.status(404).json({ message: "Delivery address not found" });
     }
 
-    address.set(newAddress);
+    user.deliveryAddresses[addressIndex] = { ...user.deliveryAddresses[addressIndex], ...deliveryAddress };
+
     await user.save();
 
     res.status(200).json({ message: "Address updated successfully" });

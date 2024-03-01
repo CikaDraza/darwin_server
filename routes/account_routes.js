@@ -1,5 +1,5 @@
 import express from "express";
-import { createUser, getUser, getUsers, loginUser } from "../controllers/company_account_controller.js";
+import { createUser, getUser, getUsers, loginUser, updateDeliveryAddress } from "../controllers/company_account_controller.js";
 import { check } from 'express-validator';
 
 const router = express.Router();
@@ -14,5 +14,6 @@ router.post("/login", [
 ], loginUser);
 router.get("/", getUsers);
 router.get("/user/:id", getUser);
+router.put("/update_delivery_address", updateDeliveryAddress);
 
 export default router;

@@ -36,7 +36,7 @@ const companyAccountSchema = new mongoose.Schema(
   billingAddress: {
     street: String,
     number: String,
-    postalCode:String,
+    postalCode: String,
     city: String,
     country: String
   },

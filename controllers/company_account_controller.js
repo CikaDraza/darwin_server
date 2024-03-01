@@ -6,20 +6,7 @@ import { validationResult } from 'express-validator';
 
 export const createUser = expressAsyncHandler(async (req, res) => {
   try {
-    const { email, password, companyName, vat, name, lastName, gender, billingAddress, deliveryAddresses, phoneNr, details, newsletter,    darwinPartner } = req.body;
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-
-    if (!emailRegex.test(email)) {
-      res.status(400);
-      throw new Error("Invalid email format");
-    }
-    
-    if (!passwordRegex.test(password)) {
-      res.status(400);
-      throw new Error("Password must be at least 8 characters long and include at least one number");
-    }
+    const { email, password, companyName, vat, name, lastName, gender, billingAddress, deliveryAddresses, phoneNr, details, newsletter, darwinPartner } = req.body;
   
     if(!email || !password || !vat) {
       res.status(400);
@@ -35,7 +22,7 @@ export const createUser = expressAsyncHandler(async (req, res) => {
   
     const hashedPassword = await bcrypt.hash(password, 10);
   
-    const newUser = await Company_account.create({
+    const newUser = new Company_account({
       email,
       password: hashedPassword,
       companyName,
@@ -50,20 +37,30 @@ export const createUser = expressAsyncHandler(async (req, res) => {
       newsletter,
       darwinPartner
     });
-  
-    if(newUser) {
-      res.status(201).json({
-        _id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        password: newUser.password,
-        token: generateToken(newUser._id)
-      });
 
-    }else {
-      res.status(400);
-      throw new Error("The user does not exist");
-    }
+    const user = await newUser.save();
+    const token = generateToken(newUser._id);
+
+    res.send({
+      token,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      vat: user.vat,
+      companyName: user.companyName,
+      gender: user.gender,
+      address: user.address,
+      phoneNr: user.phoneNr,
+      country: user.country,
+      city: user.city,
+      postalcode: user.postalcode,
+      billingAddress: user.billingAddress,
+      deliveryAddresses: user.deliveryAddresses,
+      details: user.details,
+      darwinPartner: user.darwinPartner,
+      newsletter: user.newsletter,
+    });
+
   } catch (error) {
     res.status(500).json({ message: "An error occurred while creating a new user" });
   }
@@ -91,7 +88,6 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
     }
 
     const token = generateToken(user._id);
-    console.log(token);
     res.json({
       token,
       _id: user._id,
@@ -205,6 +201,22 @@ export const getUsers = async (req, res) => {
     });
   }
 };
+
+export const getUser = expressAsyncHandler(async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await Company_account.findById(userId);
+    if (user) {
+      res.send(user);
+    } else {
+      res.status(404).send({ message: 'User not found' });
+    }
+  }catch(error) {
+    res.status(404).json({
+      message: error.message
+    });
+  }
+});
 
 export const deleteUser = async (req, res) => {
   const id = req.params.id;
